@@ -1,0 +1,9 @@
+requests
+beautifulsoup4
+pyspark
+pymongo
+hdfs
+selenium
+apscheduler
+asyncio
+lxml
