@@ -69,6 +69,22 @@ services:
     networks:
       - hadoop_network
 
+  python-app-ia:
+    image: python:3.11.5
+    container_name: python-app-ia
+    depends_on:
+      - namenode
+      - datanode
+      - mongodb
+      - selenium-chrome
+    volumes:
+      - ./IA:/IA
+    working_dir: /IA
+    command: >
+      bash -c "pip install -r requirements.txt && sleep 10 && python prediction.py"
+    networks:
+      - hadoop_network
+
 networks:
   hadoop_network:
     driver: bridge

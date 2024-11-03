@@ -142,7 +142,6 @@ def should_update_webtoon(day_info, day_filter, last_update):
 
     return today_is_update_day
 
-
 # Récupérer tous les liens de pagination et les trier par numéro de page
 async def get_all_pagination_links_async(base_url):
     pagination_links = set()
@@ -210,7 +209,26 @@ async def get_webtoon_episodes_async(webtoon_url, episode_limit=None):
     
     return episodes
 
-# Fonction pour récupérer les détails d'un webtoon de manière asynchrone
+# Fonction pour convertir les vues de format string en entier
+def convert_views(view_str):
+    view_str = view_str.replace('\xa0', ' ').replace(' ', '').strip()
+    if 'M' in view_str:
+        return int(float(view_str.replace('M', '').replace(',', '.')) * 1e6)
+    elif 'K' in view_str:
+        return int(float(view_str.replace('K', '').replace(',', '.')) * 1e3)
+    else:
+        return int(view_str.replace(',', ''))
+
+# Fonction pour convertir les abonnés en entier
+def convert_subscribers(subscriber_str):
+    subscriber_str = subscriber_str.replace('\xa0', ' ').replace(' ', '').strip()
+    return int(subscriber_str)
+
+# Fonction pour convertir la note en float
+def convert_rating(rating_str):
+    return float(rating_str.replace(',', '.').strip())
+
+# Fonction pour récupérer les détails d'un webtoon de manière asynchrone avec conversion des données numériques
 async def get_webtoon_details_async(webtoon_url):
     response = await fetch_with_retry_async(webtoon_url)
     if response is None:
@@ -239,11 +257,7 @@ async def get_webtoon_details_async(webtoon_url):
         
         for section in author_sections:
             name = section.select_one("h3.title").text.strip() if section.select_one("h3.title") else ""
-            try:
-                desc = section.select_one("p.desc").text.strip() if section.select_one("p.desc") else ""
-            except Exception as e:
-                print(f"[Erreur] Impossible de récupérer la description de auteurs {name}: {e}")
-            
+            desc = section.select_one("p.desc").text.strip() if section.select_one("p.desc") else ""
             authors_info.append({"name": name, "description": desc})
         
         webtoon_info['authors'] = authors_info
@@ -251,19 +265,24 @@ async def get_webtoon_details_async(webtoon_url):
     except Exception as e:
         print(f"[Erreur] Impossible de récupérer les informations des auteurs: {e}")
 
-
     try:
-        webtoon_info['views'] = soup.select_one("ul.grade_area li span.ico_view + em").text.strip() if soup.select_one("ul.grade_area li span.ico_view + em") else ""
+        # Extraire les vues et les convertir en entier
+        views_str = soup.select_one("ul.grade_area li span.ico_view + em").text.strip() if soup.select_one("ul.grade_area li span.ico_view + em") else ""
+        webtoon_info['views'] = convert_views(views_str) if views_str else 0
     except Exception as e:
         print(f"[Erreur] Impossible de récupérer le nombre de vues: {e}")
 
     try:
-        webtoon_info['subscribers'] = soup.select_one("ul.grade_area li span.ico_subscribe + em").text.strip() if soup.select_one("ul.grade_area li span.ico_subscribe + em") else ""
+        # Extraire les abonnés et les convertir en entier
+        subscribers_str = soup.select_one("ul.grade_area li span.ico_subscribe + em").text.strip() if soup.select_one("ul.grade_area li span.ico_subscribe + em") else ""
+        webtoon_info['subscribers'] = convert_subscribers(subscribers_str) if subscribers_str else 0
     except Exception as e:
         print(f"[Erreur] Impossible de récupérer le nombre d'abonnés: {e}")
 
     try:
-        webtoon_info['rating'] = soup.select_one("ul.grade_area li span.ico_grade5 + em").text.strip() if soup.select_one("ul.grade_area li span.ico_grade5 + em") else ""
+        # Extraire la note et la convertir en float
+        rating_str = soup.select_one("ul.grade_area li span.ico_grade5 + em").text.strip() if soup.select_one("ul.grade_area li span.ico_grade5 + em") else ""
+        webtoon_info['rating'] = convert_rating(rating_str) if rating_str else 0.0
     except Exception as e:
         print(f"[Erreur] Impossible de récupérer la note: {e}")
 
@@ -285,7 +304,7 @@ async def get_webtoon_details_async(webtoon_url):
     except Exception as e:
         print(f"[Erreur] Impossible de récupérer le QR code: {e}")
     
-    # Récupérer les épisodes`
+    # Récupérer les épisodes de manière asynchrone
     try:
         webtoon_info['episodes'] = await get_webtoon_episodes_async(webtoon_url)
     except Exception as e:
@@ -293,6 +312,7 @@ async def get_webtoon_details_async(webtoon_url):
         webtoon_info['episodes'] = []
 
     return webtoon_info
+
 
 # Fonction pour traiter chaque webtoon de manière asynchrone
 async def process_webtoon(genre_url, webtoon_url, processed_webtoons, day_filter):
