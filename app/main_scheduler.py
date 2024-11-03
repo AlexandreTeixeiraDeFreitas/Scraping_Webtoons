@@ -25,8 +25,8 @@ def run_extraction():
     ))
     print(f"[INFO] Fin de l'extraction des webtoons à {datetime.now()}")
     
-    # Appeler l'update des commentaires après extraction
-    run_comment_update()
+    # # Appeler l'update des commentaires après extraction
+    # run_comment_update()
 
 start_time_extraction = datetime.now() + timedelta(seconds=10)
 
