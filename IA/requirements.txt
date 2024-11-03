@@ -1,0 +1,5 @@
+pymongo
+numpy
+pandas
+scikit-learn
+hdfs
