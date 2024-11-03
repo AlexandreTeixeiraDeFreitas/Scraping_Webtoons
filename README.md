@@ -34,7 +34,7 @@ Une fonctionnalité IA a été intégrée pour prédire le rating des webtoons e
 - **Python 3.11**
 - **MongoDB** (local ou hébergé dans Docker)
 - **Hadoop** avec un environnement HDFS accessible
-- **Selenium avec Chrome** pour le scraping des pages Web
+- **Selenium avec Chrome** pour le scraping des commentaires des pages Web
 - **Docker et Docker Compose** pour l'exécution de l'application dans des conteneurs
 
 ## Installation
