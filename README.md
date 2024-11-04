@@ -167,4 +167,7 @@ La fonction `run_comment_update()` a été mise en commentaire dans `main_schedu
 
 ---
 
+Lien Canva 
+https://www.canva.com/design/DAGVguImwxs/D8psJty6h9LaDFKTTqleyw/edit?utm_content=DAGVguImwxs&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+
 Ce README est maintenant mis à jour pour inclure la section de prédiction IA avec des détails supplémentaires pour l’exécution et l’interprétation des résultats de la prédiction.
